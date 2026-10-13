@@ -12,7 +12,7 @@
 4. [Cost — MVP and complete product](#4-cost--mvp-and-complete-product)
 5. [Tools, APIs and running cost](#5-tools-apis-and-running-cost)
 6. [Technology stack](#6-technology-stack)
-7. [Simple MVP — features and flow](#7-simple-mvp--features-and-flow)
+7. [The MVP — six features](#7-the-mvp--six-features)
 8. [After MVP — remaining features and full architecture](#8-after-mvp--remaining-features-and-full-architecture)
 9. [Decisions we need from you](#9-decisions-we-need-from-you)
 10. [References](#10-references)
@@ -84,6 +84,8 @@ We checked the terms directly:
 
 This gives CONTAKS a real owned registry at zero licence cost, with Google used only to fill live gaps.
 
+> **Note on the MVP:** the MVP described in Section 7 uses **Overture only**. No Google, no Yelp, no licensed vendor. This means the MVP carries **no licensing risk and no contract negotiation**, and can begin immediately.
+
 ---
 
 ### Challenge 2 — Duplicate and conflicting records
@@ -99,11 +101,13 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 - Keep the disputed values and the decision history for review
 - Block the Call button when the destination confidence is too low
 
+*This applies from V2 onward. The MVP uses a single source, so there is nothing to reconcile yet.*
+
 ---
 
 ### Challenge 3 — Latency and provider outages
 
-**The problem:** if Google is slow, the whole search must not hang. If one provider fails, valid results from others must still appear.
+**The problem:** if an external provider is slow, the whole search must not hang. If one provider fails, valid results from others must still appear.
 
 **Our solution:**
 
@@ -112,6 +116,8 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 - Stream registry results immediately; merge slower results in without duplicate cards
 - Circuit breakers per source: a failing provider is skipped, not retried forever
 - Show honest partial status, with a capped refresh window and no infinite spinner
+
+*The MVP queries only its own database, so it has no external latency risk at all.*
 
 ---
 
@@ -126,6 +132,8 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 - Per-tenant quotas and rate limits
 - Track **cost per successful search** and **cost per connected call**, not average request cost
 - Cache only what each source's licence permits
+
+*In the MVP the only variable cost is one LLM call per search, which is both small and capped.*
 
 ---
 
@@ -142,6 +150,8 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 - Webhook signature verification; repeated callbacks handled idempotently
 - Recording and transcription disabled by default
 
+*The MVP uses a plain `tel:` link, which carries none of this risk because no call passes through our servers.*
+
 ---
 
 ### Challenge 6 — Unsafe web content
@@ -155,6 +165,8 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 - SSRF protection and redirect checking on every fetch
 - A fetched page cannot change agent behaviour, reveal credentials or reach internal addresses
 
+*The MVP does not fetch web pages.*
+
 ---
 
 ### Challenge 7 — Demand and supply (not covered in the original proposal)
@@ -164,7 +176,7 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 1. Why would a user open CONTAKS instead of typing the same query into Google?
 2. Why would a business claim a profile on a platform with no traffic?
 
-**Our position:** these are not engineering problems and we cannot solve them with code. They need a go-to-market plan from the client side. We recommend the MVP be designed specifically to measure the first question cheaply, before large investment.
+**Our position:** these are not engineering problems and we cannot solve them with code. They need a go-to-market plan from the client side. The MVP in Section 7 is deliberately designed to measure the first question as cheaply as possible, before any large investment.
 
 ---
 
@@ -174,118 +186,105 @@ This gives CONTAKS a real owned registry at zero licence cost, with Google used 
 
 All figures are engineering hours. They exclude client-side costs, legal review and marketing.
 
-| Scope | Description | Hours | Calendar time |
+| Stage | Description | Hours | Calendar time |
 | --- | --- | --- | --- |
-| **Phase 0** | Technical validation | 120 | 2–3 weeks |
-| **Tier A — Proof** | Simplest working version, 1 city | 160 | 3–4 weeks, 1 dev |
-| **Tier B — MVP** | Recommended MVP, 1–2 cities | 520 | 6–8 weeks, 2 devs |
-| **Tier C — Complete** | Full scope from the proposal | 1,920 | 17–22 weeks, 2–3 devs |
-
-### Tier C breakdown
-
-| Work package | Hours |
-| --- | --- |
-| Phase 0 validation | 120 |
-| V1 — core search platform | 520 |
-| V2 — accounts, claims, admin | 320 |
-| V3 — in-platform calling | 280 |
-| V4 — monetisation, expansion | 360 |
-| PM, QA, buffer (20%) | 320 |
-| **Total** | **1,920** |
+| **MVP** | The six features in Section 7, one city | **160** | **3–4 weeks, 1 developer** |
+| **V2** | Multi-source search and trust layer | 360 | 5–6 weeks, 2 developers |
+| **V3** | Accounts, business claims, admin panel | 320 | 4–5 weeks, 2 developers |
+| **V4** | In-platform calling (Twilio) | 280 | 3–4 weeks, 2 developers |
+| **V5** | Subscriptions, city expansion | 360 | 4–5 weeks, 2 developers |
+| **PM, QA, buffer** | 20% across all stages | 300 | — |
+| **Complete product** | All of the above | **1,780** | **20–24 weeks** |
 
 ### Cost at different blended rates
 
 Rate to be confirmed with FlexTBS commercial team.
 
-| Blended rate | Phase 0 | Tier A Proof | Tier B MVP | Tier C Complete |
-| --- | --- | --- | --- | --- |
-| USD 25 / hr | $3,000 | $4,000 | $13,000 | $48,000 |
-| USD 35 / hr | $4,200 | $5,600 | $18,200 | $67,200 |
-| USD 50 / hr | $6,000 | $8,000 | $26,000 | $96,000 |
+| Blended rate | MVP (160 hrs) | Through V2 (520 hrs) | Complete (1,780 hrs) |
+| --- | --- | --- | --- |
+| USD 25 / hr | **$4,000** | $13,000 | $44,500 |
+| USD 35 / hr | **$5,600** | $18,200 | $62,300 |
+| USD 50 / hr | **$8,000** | $26,000 | $89,000 |
 
 ### Important note on the original quote
 
-The original CONTAKS scope of **USD 18,000 over 90 working days** was priced for a **static directory MVP**. The platform described in the proposal is a different product: multi-source retrieval, entity resolution, provenance tracking, licence enforcement and telephony. Holding the original figure against this scope would set the project up to fail. We recommend re-quoting after Phase 0.
+The original CONTAKS scope of **USD 18,000 over 90 working days** was priced for a **static directory MVP**. The complete platform described in the proposal is a different product: multi-source retrieval, entity resolution, provenance tracking, licence enforcement and telephony. Holding the original figure against the full scope would set the project up to fail.
+
+Note also the reverse: the MVP we recommend is **smaller and cheaper** than the original quote, because it deliberately strips everything that is not needed to answer the one open question.
 
 ### Our recommended commercial path
 
-1. Client approves **Phase 0 only** — small fixed fee, 2–3 weeks
-2. Phase 0 produces measured coverage, relevance, latency and cost figures
-3. FlexTBS issues a firm quote for Tier B based on real numbers
-4. Tier C is scoped only after the MVP has real usage data
+1. Client approves the **MVP only** — a small fixed fee, 3–4 weeks
+2. The MVP ships to a single city and runs for 3–4 weeks collecting real usage data
+3. FlexTBS issues a firm quote for V2 based on what that data shows
+4. Later versions are scoped only after the previous one has proven its value
 
 ---
 
 ## 5. Tools, APIs and running cost
 
-### Required from day one
+### Required for the MVP — four items, zero contracts
 
 | Service | Purpose | Lead time | Cost |
 | --- | --- | --- | --- |
-| **Overture Maps** | Base business registry | None — public download | **Free** |
-| **Google Maps Platform** | Live enrichment, geocoding | 1 day | Pay per call |
-| **OpenAI or Anthropic API** | Query understanding, extraction | Instant | Pay per token |
-| **Managed PostgreSQL + PostGIS** | Primary database | 1 hour | $25–70 / mo |
-| **GitHub** | Repository, CI/CD | Instant | Free–$4 / user |
+| **Overture Maps** | The business data itself | None — public download | **Free** |
+| **OpenAI or Anthropic API** | Reading the user's query | Instant | \~$20 / mo at pilot volume |
+| **Managed PostgreSQL + PostGIS** | Storing the city's data | 1 hour | \~$25 / mo |
+| **Container hosting** | Running the site | 1 hour | \~$20 / mo |
 
-### Required for the full MVP
+**MVP running cost: roughly USD 65–150 per month.**
 
-| Service | Purpose | Cost |
-| --- | --- | --- |
-| **Redis** | Cache, quotas, task broker | $10–30 / mo |
-| **Container hosting** | API and workers | $30–100 / mo |
-| **Managed auth (OIDC)** | User accounts | Free tier → $25 / mo |
-| **Sentry** | Error tracking | Free tier |
-| **Email provider** | Claim verification | Free tier |
-| **Domain + DNS** |  | \~$15 / year |
+This is the single most important operational point in this document: the MVP needs **no vendor contract, no API approval, no identity verification and no legal negotiation**. Work can begin the day it is approved.
 
-### Required later (Phase 2+)
+### Required later (V2 onward)
 
 | Service | Purpose | Lead time | Cost |
 | --- | --- | --- | --- |
+| **Google Maps Platform** | Live enrichment, geocoding | 1 day | Pay per call, \~$100–500 / mo |
+| **Redis** | Cache, quotas, task broker | Instant | $10–30 / mo |
+| **Managed auth (OIDC)** | User accounts | Instant | Free tier → $25 / mo |
+| **Sentry** | Error tracking | Instant | Free tier |
+| **Email provider** | Claim verification | Instant | Free tier |
 | **Twilio Voice** | In-platform calling | 2–5 days verification | \~$0.004/min browser leg, \~$0.014/min US outbound, \~$1.15/mo per number |
 | **Stripe** | Subscriptions | 2–7 days verification | 2.9% + 30¢ per transaction |
 | **Licensed dataset** | Deeper coverage if needed | **Unknown — needs negotiation** | Unknown |
 
-### ⚠ Procurement items to start in week 1
+### ⚠ Procurement items — start these when V2 is approved, not before
 
-These block work later if left late:
+These block work if left late, but **none of them block the MVP**:
 
 1. **Licensed dataset contract** — longest lead time, unknown duration
 2. **Google Cloud billing account** — requires card and sometimes identity checks
 3. **Twilio account and caller ID verification** — US voice requires identity verification
 4. **Stripe business verification** — requires company documents
 
-### Estimated monthly running cost at pilot scale
+### Running cost by stage
 
-| Item | Range |
+| Stage | Monthly cost |
 | --- | --- |
-| Database, Redis, hosting | $70–200 |
-| LLM tokens | $50–300 |
-| Google Places calls | $100–500 |
-| Monitoring, email, misc | $30–80 |
-| **Subtotal** | **$250–1,080 / month** |
-| Twilio (if V3 built) | Usage-based, see rates above |
-| Dataset licence | Unknown until vendor confirmed |
+| **MVP** | **$65–150** |
+| V2 (adds Google, Redis, auth) | $250–700 |
+| V4+ (adds Twilio, Stripe) | $400–1,100 + usage |
 
 ---
 
 ## 6. Technology stack
 
-| Layer | Choice | Why |
+| Layer | Choice | Used from |
 | --- | --- | --- |
-| **Frontend** | Next.js, React, TypeScript | Responsive web, server-side rendering, streaming results |
-| **Backend API** | Python, FastAPI, Pydantic | Validated contracts, async-friendly for parallel retrieval |
-| **Agent layer** | Fixed-graph workflow (OpenAI Agents SDK or equivalent) | Bounded, traceable, no autonomous loops |
-| **Primary database** | Managed PostgreSQL + PostGIS | Business records, provenance, geographic filtering |
-| **Search matching** | Postgres full-text + trigram indexes | Start simple; add pgvector only if evaluation proves it helps |
-| **Cache and quotas** | Redis | Permitted short-lived cache, rate limits, coordination |
-| **Background jobs** | Celery with Redis broker | Overture refresh, expiry, imports, retries |
-| **Calling** | Twilio Voice JavaScript SDK | Only if in-platform calling is selected |
-| **Auth** | Managed OIDC provider | Account security without building it |
-| **Payments** | Stripe | Only when a subscription model is confirmed |
-| **Hosting** | Docker on managed container hosting | Separate scaling for API and workers |
-| **Observability** | OpenTelemetry, Sentry, CI/CD | Trace searches, costs, failures |
+| **Frontend** | Next.js, React, TypeScript | MVP |
+| **Backend API** | Python, FastAPI, Pydantic | MVP |
+| **Primary database** | Managed PostgreSQL + PostGIS | MVP |
+| **Search matching** | Postgres full-text + trigram indexes | MVP |
+| **LLM** | OpenAI or Anthropic API, single call per search | MVP |
+| **Hosting** | Docker on managed container hosting | MVP |
+| **Agent layer** | Fixed-graph workflow (OpenAI Agents SDK or equivalent) | V2 |
+| **Cache and quotas** | Redis | V2 |
+| **Background jobs** | Celery with Redis broker | V2 |
+| **Observability** | OpenTelemetry, Sentry, CI/CD | V2 |
+| **Auth** | Managed OIDC provider | V3 |
+| **Calling** | Twilio Voice JavaScript SDK | V4 |
+| **Payments** | Stripe | V5 |
 
 ### Design principles behind these choices
 
@@ -293,10 +292,11 @@ These block work later if left late:
 - **Managed services over self-hosted.** Engineering time goes into the product, not infrastructure.
 - **Fixed agent graph, not free-roaming agents.** Predictable cost, reproducible behaviour, auditable decisions.
 - **Deterministic reconciliation.** Entity resolution uses rules, not model judgement, so results are explainable.
+- **Start simple.** Postgres full-text search first. Add vector search only if measurement proves it helps.
 
 ---
 
-## 7. Simple MVP — features and flow
+## 7. The MVP — six features
 
 ### Platform
 
@@ -306,53 +306,60 @@ Users open it in a phone browser, search, tap Call, and their dialer opens. This
 
 A Progressive Web App (add-to-home-screen icon) can be added later in about two days. A native app only makes sense once there are proven users.
 
-### MVP feature list
+### The six features
 
-| # | Feature | Detail |
+| # | Feature | What it means |
 | --- | --- | --- |
-| 1 | **Natural language search** | One input field, plain sentences |
-| 2 | **Query parser** | LLM extracts service, location, specialty, count → validated JSON |
-| 3 | **Clarification prompt** | One short question when the location is genuinely ambiguous. Never guesses silently |
-| 4 | **Owned registry** | Overture Places loaded into PostgreSQL + PostGIS, one city |
-| 5 | **Live Google enrichment** | Fetched at search time, attributed, never stored |
-| 6 | **Entity resolution** | Merge the same business across sources; keep branches separate |
-| 7 | **Results list** | Up to 5, each with name, category, distance, phone, match reason, source chip, last-checked date |
-| 8 | **Business profile page** | Everything known, with source and date per field. Unknown fields shown as unknown |
-| 9 | **Click-to-call** | `tel:` link opening the device dialer |
-| 10 | **Honest states** | Truthful progress text, partial results, zero-result suggestions. Never pads a list |
-| 11 | **Analytics** | Searches run, results clicked, call clicks, zero-result queries |
+| **1** | **One search box** | The user types what they need in plain English. One field, nothing else. |
+| **2** | **AI reads the query** | A single LLM call pulls out two things: **what service**, and **which area**. |
+| **3** | **One city's data in our database** | Overture Places for a single city, loaded into PostgreSQL + PostGIS. Free, downloadable, legally ours to store and display. |
+| **4** | **Up to 5 results** | Each showing name, address, phone, and why it matched. Never more than five. |
+| **5** | **Call button** | A plain `tel:` link that opens the phone's own dialer. No telephony infrastructure. |
+| **6** | **Count the clicks** | How many searches were run, and how many Call buttons were pressed. |
 
-### Explicitly NOT in the MVP
+### Everything else is out
 
-User accounts · saved businesses · business claim flow · business dashboard · admin panel · Twilio browser calling · payments · reviews · bookings · quote requests · multiple cities · mobile apps · Yelp integration
+No user accounts · no login · no saved businesses · no business claim flow · no business dashboard · no admin panel · no Twilio · no payments · no reviews · no bookings · no second city · no Google · no Yelp · no licensed dataset · no mobile app
 
 ### MVP flow
 
 ```mermaid
 flowchart TD
-    U["User types in plain English<br/>'plumber downtown, commercial leak'"] --> P["Query Parser<br/>LLM to structured JSON"]
-    P --> F["Filters:<br/>service · area · specialty"]
-    F --> DB[("CONTAKS Registry<br/>PostgreSQL + PostGIS<br/>Overture Places")]
-    F --> G["Google Places<br/>live, not stored"]
-    DB --> M["Merge + de-duplicate"]
-    G --> M
-    M --> R["Rank + write match reason"]
-    R --> UI["Up to 5 results<br/>with source and date"]
-    UI --> C["Call button"]
-    C --> PH["Device phone dialer"]
+    U["1 · One search box<br/>user types in plain English"] --> AI["2 · AI reads the query<br/>what service · which area"]
+    AI --> DB[("3 · One city's data<br/>PostgreSQL + PostGIS<br/>Overture Places")]
+    DB --> R["4 · Up to 5 results<br/>name · address · phone · why it matched"]
+    R --> C["5 · Call button<br/>plain tel: link"]
+    C --> PH["Phone's own dialer"]
+    R -.-> AN["6 · Count the clicks"]
+    C -.-> AN
 ```
+
+### Why this is the right MVP
+
+|  |  |
+| --- | --- |
+| **Build time** | 3–4 weeks, one developer |
+| **Running cost** | \~$65–150 / month |
+| **Contracts required** | **None** |
+| **API approvals required** | **None** |
+| **Legal risk** | **None** — Overture is openly licensed for storage and display |
+| **Can start** | Immediately on approval |
 
 ### What the MVP is designed to answer
 
-1. Does natural language search beat a category dropdown in practice?
+1. Does natural language search actually beat a category dropdown in practice?
 2. **Do users click Call?**
-3. Where are the coverage gaps?
+3. Where are the coverage gaps in a single city?
 
-Three questions, three measured answers, in six to eight weeks.
+Three questions, three measured answers, in three to four weeks.
 
 ### Recommendation on sequencing
 
-**Ship the MVP, then pause building for three to four weeks and watch the data.** The temptation will be to roll straight into the next phase. We advise against it. If click-to-call volume is low, in-platform calling should not be built at all and that budget should go into coverage instead. If no business ever claims a profile, the business dashboard is wasted effort.
+**Ship the MVP, then pause building for three to four weeks and watch the data.** The temptation will be to roll straight into V2. We advise against it.
+
+- If click-to-call volume is low, in-platform calling (V4) should not be built at all, and that budget should go into coverage instead.
+- If no business ever claims a profile, the business dashboard (V3) is wasted effort.
+- If users keep searching outside the pilot city, expansion matters more than features.
 
 Building the full roadmap continuously assumes the answers are already known. They are not.
 
@@ -364,11 +371,30 @@ Building the full roadmap continuously assumes the answers are already known. Th
 
 | Version | Scope | Hours | Gate before starting |
 | --- | --- | --- | --- |
-| **V2** | Accounts, business claims, admin panel | 320 | MVP shows repeat usage |
-| **V3** | Twilio in-platform calling | 280 | **MVP shows real call-click volume** |
-| **V4** | Subscriptions, city expansion, third source | 360 | Business metrics justify investment |
+| **V2** | Multi-source search and trust layer | 360 | MVP shows users search more than once |
+| **V3** | Accounts, business claims, admin panel | 320 | V2 shows repeat usage and coverage demand |
+| **V4** | Twilio in-platform calling | 280 | **MVP/V2 show real call-click volume** |
+| **V5** | Subscriptions, city expansion | 360 | Business metrics justify investment |
 
-### V2 — Accounts and supply side
+---
+
+### V2 — Multi-source search and trust layer
+
+This is where everything deliberately cut from the MVP comes back.
+
+- **Google Places live enrichment** — fetched at search time, attributed, never stored
+- **Orchestrator** — parallel source dispatch under a shared deadline and cost budget
+- **Entity resolution** — merge the same business across sources, keep branches separate
+- **Field-level evidence** — source, timestamp and confidence stored per field
+- **Business profile page** — everything known, with source and date per field; unknown fields shown as unknown
+- **Clarification prompt** — one short question when the location is genuinely ambiguous
+- **Honest states** — truthful progress text, "only 3 matched" instead of padding, useful zero-result suggestions
+- **Source attribution UI** — per-card chips and licence-compliant display
+- **Circuit breakers and partial results** — one slow provider never stalls the search
+- **Background refresh jobs** — Overture updates, TTL expiry, deletion propagation
+- **Second city**
+
+### V3 — Accounts and supply side
 
 - User sign-up and sign-in (managed OIDC)
 - Saved businesses and search history
@@ -377,7 +403,7 @@ Building the full roadmap continuously assumes the answers are already known. Th
 - Correction submission from users and owners
 - **Admin panel:** conflict review, duplicate candidates, claim approvals, failed searches, source policy status
 
-### V3 — In-platform calling
+### V4 — In-platform calling
 
 - Twilio Voice JavaScript SDK integration
 - Backend destination authorisation — browser sends business ID only
@@ -390,12 +416,12 @@ Building the full roadmap continuously assumes the answers are already known. Th
 
 **Out of scope:** call recording, transcription, AI voice agents, emergency calling.
 
-### V4 — Monetisation and expansion
+### V5 — Monetisation and expansion
 
 - Stripe subscriptions on a confirmed pricing model
 - Paid business tiers with **clearly labelled** placement
 - Expansion to 4–5 cities
-- Optional third data source if benchmarks justify it
+- Optional licensed dataset if benchmarks justify the cost
 - Cost dashboards: cost per successful search, cost per connected call
 
 ### Deferred to a separate product phase
@@ -405,6 +431,8 @@ Reviews · bookings · payments to businesses · request-a-quote · business cha
 ---
 
 ### Complete architecture — with background agents
+
+This is the full platform at V4/V5. The MVP is the small shaded path through the middle: search box, one LLM call, one database, five results, a `tel:` link.
 
 ```mermaid
 flowchart TB
@@ -491,6 +519,21 @@ flowchart TB
     TW -. "status callbacks" .-> CALLAPI
 ```
 
+### How the MVP maps onto this diagram
+
+| Full architecture component | In the MVP? |
+| --- | --- |
+| Web app | ✅ Yes, simplified |
+| Query Understanding Agent | ✅ Yes — one LLM call |
+| Registry Agent + PostgreSQL | ✅ Yes |
+| Call path | ✅ Replaced by a plain `tel:` link |
+| Orchestrator, parallel dispatch, circuit breakers | ❌ V2 |
+| Places / Licensed Data / Web Evidence agents | ❌ V2 |
+| Reconciliation service | ❌ V2 |
+| Redis, background workers | ❌ V2 |
+| Auth, budgets, admin | ❌ V3 |
+| Twilio call authorisation | ❌ V4 |
+
 ### Key architectural rules shown above
 
 1. **Search agents never place calls.** Calling is a separate authorised backend path. This is a security boundary, not a diagram convenience.
@@ -503,36 +546,43 @@ flowchart TB
 
 ## 9. Decisions we need from you
 
-Build commitment cannot be finalised until these are answered.
+### Needed to start the MVP — only two
 
-### Blocking — needed before Phase 0 completes
+1. **Which city?** One city only. We suggest the one with the strongest expected early demand.
+2. **Which service categories?** Either all of them, or a focused set such as home-repair trades.
 
-1. **Which dataset vendor?** Name, sample data, and the contract clauses covering storage, display and redistribution rights.
-2. **Which pilot city?** We recommend starting with one, not four or five.
-3. **Calling option:** click-to-call only for the MVP, or in-platform calling from the start?
+Nothing else blocks the MVP. No vendor, no contract, no API approval.
 
-### Needed before Tier B quote is finalised
+### Needed before V2 is quoted
 
+3. **Which dataset vendor, if any?** Name, sample data, and the contract clauses covering storage, display and redistribution rights. *Only needed if Overture coverage proves insufficient in measurement.*
 4. Expected traffic — searches per day at pilot scale
 5. Hard search filters that must always apply
-6. Business claim verification method — phone OTP, email domain, or document
-7. Subscription model — confirmed pricing or still tentative
-8. Hosting and ongoing maintenance responsibility — FlexTBS or client-side
+6. Second city for expansion
+
+### Needed before V3 and V4
+
+7. Business claim verification method — phone OTP, email domain, or document
+8. Calling option — confirm whether in-platform calling is still wanted after seeing MVP click data
+9. Subscription model — confirmed pricing or still tentative
+10. Hosting and ongoing maintenance responsibility — FlexTBS or client-side
 
 ### Needs client-side legal review
 
-9. US calling features touch TCPA and Do Not Call regulations. Even user-initiated calls should be reviewed by counsel before launch.
-10. All data licence terms in this document should be confirmed by your legal counsel before commercial reliance. FlexTBS is not providing legal advice.
+- US calling features touch TCPA and Do Not Call regulations. Even user-initiated calls should be reviewed by counsel before V4 launch.
+- All data licence terms in this document should be confirmed by your legal counsel before commercial reliance. FlexTBS is not providing legal advice.
 
 ---
 
 ## Summary for the client conversation
 
-> The technical plan in the original proposal is sound and we can build it. Its real value is that it identified, before any money was spent, that the whole project depends on a data licence nobody has reviewed.
+> The technical plan in the original proposal is sound and we can build it. Its real value is that it identified, before any money was spent, that the full platform depends on a data licence nobody has reviewed.
 > 
-> Google and Yelp data cannot legally be stored or presented as CONTAKS's own database, at any budget. But an open dataset called Overture Maps gives us roughly 75 million business records that we **can** store, display and build on, at zero licence cost. With that one change, the product the client imagined becomes buildable.
+> Google and Yelp data cannot legally be stored or presented as CONTAKS's own database, at any budget. But an open dataset called Overture Maps gives us roughly 75 million business records that we **can** store, display and build on, at zero licence cost.
 > 
-> We recommend a short paid validation phase to settle the data question with real measurements, then a firm quote for a six-to-eight-week MVP in a single city. The MVP is deliberately small because it exists to answer one question that nobody can currently answer: do users actually click Call?
+> So we propose starting with a deliberately small MVP: one search box, one AI call to read the query, one city of Overture data, five results, a Call button, and click counting. Six features. Three to four weeks. One developer. Around $65–150 a month to run. **No contracts, no API approvals, no legal risk — work can start immediately.**
+> 
+> That MVP exists to answer one question that nobody can currently answer: **do users actually click Call?** Everything else in the roadmap should be decided by that answer, not before it.
 
 ---
 
@@ -552,4 +602,4 @@ Terms and documentation reviewed 13 October 2026.
 
 ---
 
-*All cost and timeline figures in this document are estimates based on the scope described. They assume the dataset licensing question resolves cleanly. If the licence terms turn out to be restrictive, add three to four weeks for redesign. Final pricing follows Phase 0 measurement.*
+*All cost and timeline figures in this document are estimates based on the scope described. The MVP estimate assumes Overture Maps only and carries no licensing dependency. Figures for V2 and later assume the dataset licensing question resolves cleanly; if licence terms turn out to be restrictive, add three to four weeks for redesign. Final pricing for each stage follows the measurement from the previous one.*
